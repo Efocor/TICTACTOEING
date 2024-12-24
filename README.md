@@ -31,6 +31,7 @@ The game implements a carefully crafted design system featuring:
 
 ## 🎯 Future Improvements
 
+- [ ] Fix sizes and UI details
 - [ ] AI opponent implementation
 - [ ] Local multiplayer scores
 - [ ] Theme customization
