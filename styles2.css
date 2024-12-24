@@ -1,0 +1,264 @@
+/* styles.css que trabaja la lógica de diseño del juego. */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', 'Rajdhani', sans-serif;
+    background: linear-gradient(135deg, #120458, #4d0c6b, #b30c64);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de grid en el fondo */
+body::before {
+    content: '';
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: linear-gradient(0deg, transparent 24%, 
+                rgba(255, 255, 255, .05) 25%,
+                rgba(255, 255, 255, .05) 26%, 
+                transparent 27%, transparent 74%,
+                rgba(255, 255, 255, .05) 75%,
+                rgba(255, 255, 255, .05) 76%, transparent 77%),
+            linear-gradient(90deg, transparent 24%, 
+                rgba(255, 255, 255, .05) 25%,
+                rgba(255, 255, 255, .05) 26%, 
+                transparent 27%, transparent 74%,
+                rgba(255, 255, 255, .05) 75%,
+                rgba(255, 255, 255, .05) 76%, transparent 77%);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: 1;
+}
+
+.container {
+    background: rgba(16, 16, 28, 0.85);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(255, 0, 255, 0.2),
+                inset 0 0 30px rgba(0, 255, 255, 0.2);
+    border: 2px solid rgba(255, 0, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 2;
+}
+
+h1 {
+    text-align: center;
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 2rem;
+    font-size: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    text-shadow: 2px 2px 15px rgba(255, 0, 255, 0.5);
+    position: relative;
+}
+
+h1::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    color: rgba(255, 0, 255, 0.4);
+    filter: blur(4px);
+    z-index: -1;
+}
+
+.score-board {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.player-score {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(25, 25, 35, 0.9);
+    border-radius: 15px;
+    min-width: 160px;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    transform: perspective(1000px) rotateX(5deg);
+}
+
+.player-score h2 {
+    font-size: 1.3rem;
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.player-score p {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px #ff00ff,
+                 0 0 20px #ff00ff,
+                 0 0 30px #ff00ff;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 2rem;
+    padding: 20px;
+    background: rgba(25, 25, 35, 0.7);
+    border-radius: 20px;
+    border: 2px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+.cell {
+    width: 110px;
+    height: 110px;
+    background: rgba(16, 16, 28, 0.95);
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 0, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.cell::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+.cell:hover {
+    background: rgba(255, 0, 255, 0.1);
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+}
+
+.cell.x {
+    color: #ff00ff;
+    text-shadow: 0 0 10px #ff00ff,
+                 0 0 20px #ff00ff;
+}
+
+.cell.o {
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff,
+                 0 0 20px #00ffff;
+}
+
+button {
+    padding: 1.2rem 2.5rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.6);
+}
+
+.winning-cell {
+    background: linear-gradient(45deg, #ff00ff, #00ffff) !important;
+    color: white !important;
+    animation: winnerPulse 1s ease infinite;
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.7) !important;
+}
+
+@keyframes winnerPulse {
+    0% { transform: scale(1); filter: hue-rotate(0deg); }
+    50% { transform: scale(1.1); filter: hue-rotate(180deg); }
+    100% { transform: scale(1); filter: hue-rotate(360deg); }
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes gridMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+}
+
+/* Efectos de hover mejorados */
+.cell:hover, button:hover, .player-score:hover {
+    border-color: rgba(255, 0, 255, 0.5);
+    filter: brightness(1.2);
+}
+
+/* Efecto de resplandor activo */
+.cell:active, button:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 50px rgba(255, 0, 255, 0.8);
+}
+
+/* Agregar efecto de scanline */
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}
