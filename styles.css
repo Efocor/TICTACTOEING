@@ -1,0 +1,615 @@
+/* styles.css que trabaja la lógica de diseño del juego. */
+:root {
+    /*....colores base....*/
+    --primary-pastel: #FFB7FF;
+    --secondary-pastel: #B7FFFF;
+    --accent-pastel: #FFE4E1;
+    --x-color: #FF6B95;  /* Rojo pastel para X */
+    --o-color: #6B95FF;  /* Azul pastel para O */
+    --win-gradient: linear-gradient(45deg, #FFD700, #FFA500);
+    
+    /*....efectos y sombras....*/
+    --neon-soft-1: rgba(255, 183, 255, 0.3);
+    --neon-soft-2: rgba(183, 255, 255, 0.3);
+    --glow-x: 0 0 15px var(--x-color);
+    --glow-o: 0 0 15px var(--o-color);
+    
+    /*....dimensiones....*/
+    --cell-size: min(calc(25vw), 100px);
+    --border-radius: 40px;
+    --grid-padding: clamp(15px, 1.5vw, 20px);
+    --grid-gap: clamp(40px, 1vw, 40px);
+    
+    /*....efectos de texto....*/
+    --text-shadow-soft: 0 0 5px rgba(255, 255, 255, 0.3);
+    --text-shadow-winner: 0 0 10px rgba(255, 215, 0, 0.5);
+    
+    /*....fuentes....*/
+    --main-font: 'M PLUS Rounded 1c', 'Orbitron', sans-serif;
+    --game-font: 'Righteous', 'M PLUS Rounded 1c', sans-serif;
+}
+
+/*....importación de fuentes.... (por si acaso)*/
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: var(--main-font);
+    background: linear-gradient(135deg, 
+        #E6E6FA,  /* color bonito 1 */
+        #FFE4E1,  /* duraznito */
+        #E0FFFF   /* cian */
+    );
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5D5D81;
+    position: relative;
+    overflow-x: hidden;
+    padding: min(2vw, 1rem);
+}
+
+/*....efectos de fondo animados....*/
+.background-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    background: 
+        linear-gradient(90deg, var(--light-accent) 1px, transparent 1px),
+        linear-gradient(0deg, var(--light-accent) 1px, transparent 1px);
+    background-size: 10px 10px;
+    transform: translate(-25%, -25%) rotate(15deg);
+    animation: gridFloat 20s linear infinite;
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.background-circles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(255, 183, 255, 0.1) 0%,
+        rgba(183, 255, 255, 0.1) 100%);
+    animation: circleFloat 15s infinite ease-in-out;
+}
+
+/*....contenedor principal....*/
+.container {
+    background: rgba(255, 255, 255, 0.92);
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    border-radius: 25px;
+    box-shadow: 
+        0 10px 30px rgba(93, 93, 129, 0.2),
+        0 0 50px var(--neon-soft-1),
+        inset 0 0 30px var(--neon-soft-2);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    z-index: 2;
+    max-width: min(95vw, 500px);
+    width: 100%;
+    backdrop-filter: blur(10px);
+    transform-origin: center center;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: linear-gradient(45deg,
+        var(--primary-pastel),
+        var(--secondary-pastel)
+    );
+    border-radius: 30px;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(15px);
+    animation: glowPulse 3s infinite alternate;
+}
+
+/*....título y efectos....*/
+h1 {
+    text-align: center;
+    font-family: var(--game-font);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: clamp(1rem, 3vw, 2rem) 0;
+    position: relative;
+    color: #5D5D81;
+    padding: 0.5rem 0;
+    text-shadow: 
+        2px 2px 0 var(--primary-pastel),
+        4px 4px 0 var(--secondary-pastel),
+        0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+h1::before, h1::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+h1::before {
+    background: linear-gradient(45deg,
+        var(--primary-pastel),
+        var(--secondary-pastel)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.7;
+    transform: translateX(-1px) translateY(-1px);
+    filter: blur(2px);
+    animation: titleGlow 2s infinite alternate;
+}
+
+h1::after {
+    background: linear-gradient(-45deg,
+        rgba(255, 183, 255, 0.5),
+        rgba(183, 255, 255, 0.5)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.5;
+    transform: translateX(1px) translateY(1px);
+    filter: blur(3px);
+    animation: titleGlow 2s infinite alternate-reverse;
+}
+
+/*....decoración del título....*/
+h1 .title-decoration {
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--primary-pastel),
+        var(--secondary-pastel),
+        transparent
+    );
+    left: 0;
+}
+
+h1 .title-decoration.top {
+    top: 0;
+    transform-origin: left;
+    animation: decorationSlideTop 3s infinite;
+}
+
+h1 .title-decoration.bottom {
+    bottom: 0;
+    transform-origin: right;
+    animation: decorationSlideBottom 3s infinite;
+}
+
+@keyframes titleGlow {
+    0% {
+        filter: blur(2px);
+        opacity: 0.5;
+    }
+    100% {
+        filter: blur(3px);
+        opacity: 0.8;
+    }
+}
+
+@keyframes decorationSlideTop {
+    0%, 100% {
+        transform: scaleX(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+}
+
+@keyframes decorationSlideBottom {
+    0%, 100% {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scaleX(0.8);
+        opacity: 0.5;
+    }
+}
+
+/*....efecto de brillo al hover....*/
+h1:hover {
+    transform: translateY(-2px);
+    text-shadow: 
+        2px 2px 0 var(--primary-pastel),
+        4px 4px 0 var(--secondary-pastel),
+        0 0 15px rgba(255, 255, 255, 0.9);
+}
+
+/*....media queries para el título....*/
+@media (max-width: 480px) {
+    h1 {
+        font-size: clamp(1.5rem, 7vw, 2rem);
+        letter-spacing: 2px;
+    }
+}
+
+
+/*....tablero de puntuación....*/
+.score-board {
+    display: flex;
+    justify-content: space-around;
+    gap: clamp(1rem, 3vw, 2rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.player-score {
+    text-align: center;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    min-width: min(130px, 40vw);
+    border: 2px solid var(--primary-pastel);
+    box-shadow: 
+        0 5px 15px rgba(93, 93, 129, 0.1),
+        inset 0 0 20px rgba(255, 183, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/*....efectos del tablero de juego....*/
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, var(--cell-size));
+    gap: clamp(8px, 1.5vw, 12px);
+    margin: 2rem auto;
+    padding: clamp(12px, 2vw, 20px);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    border: 2px solid var(--secondary-pastel);
+    box-shadow: 
+        0 8px 25px rgba(93, 93, 129, 0.15),
+        inset 0 0 25px rgba(183, 255, 255, 0.2);
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.game-board::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    background: linear-gradient(45deg,
+        var(--primary-pastel),
+        var(--secondary-pastel)
+    );
+    border-radius: 25px;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(10px);
+}
+
+/*....celdas del juego....*/
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(var(--cell-size) * 0.6);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--primary-pastel);
+    box-shadow: 
+        0 5px 15px rgba(93, 93, 129, 0.1),
+        inset 0 0 15px rgba(255, 183, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--game-font);
+}
+
+.cell.x {
+    color: var(--x-color);
+    text-shadow: var(--glow-x);
+}
+
+.cell.o {
+    color: var(--o-color);
+    text-shadow: var(--glow-o);
+}
+
+.cell.winning {
+    animation: winPulse 1.5s infinite;
+    border-color: #FFD700;
+    background: var(--win-gradient);
+    color: white !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important;
+}
+
+.cell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.cell:hover::before {
+    transform: translateX(100%);
+}
+
+/*....botones y controles....*/
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: clamp(0.8rem, 1.5vw, 1.2rem) clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(0.9rem, 1.5vw, 1rem);
+    font-family: var(--main-font);
+    background: linear-gradient(45deg, 
+        var(--primary-pastel), 
+        var(--secondary-pastel)
+    );
+    border: none;
+    border-radius: 12px;
+    color: #5D5D81;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: min(130px, 40vw);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 
+        0 5px 15px rgba(93, 93, 129, 0.2),
+        inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transform: rotate(45deg) translateX(-100%);
+    transition: transform 0.6s;
+}
+
+button:hover::before {
+    transform: rotate(45deg) translateX(100%);
+}
+
+/*....mensajes del juego....*/
+.message {
+    text-align: center;
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    min-height: 2rem;
+    margin-top: 1.5rem;
+    color: #5D5D81;
+    font-weight: 500;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: messageAppear 0.5s forwards;
+}
+
+/*....animaciones.... (provisional)*/
+@keyframes winPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.05);
+        filter: brightness(1.2);
+    }
+}
+
+@keyframes glowPulse {
+    0% {
+        opacity: 0.3;
+        filter: blur(15px);
+    }
+    100% {
+        opacity: 0.6;
+        filter: blur(20px);
+    }
+}
+
+@keyframes titleGlow {
+    0% {
+        filter: blur(3px);
+        opacity: 0.5;
+    }
+    100% {
+        filter: blur(5px);
+        opacity: 0.8;
+    }
+}
+
+@keyframes messageAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gridFloat {
+    0% {
+        transform: translate(-25%, -25%) rotate(15deg);
+    }
+    100% {
+        transform: translate(-26%, -26%) rotate(16deg);
+    }
+}
+
+/* Media Queries */
+@media (max-width: 480px) {
+    :root {
+        --cell-size: min(calc(28vw), 80px);
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+/*....efectos de accesibilidad....*/
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/*....efectos de accesibilidad....*/
+@media (prefers-reduced-transparency: reduce) {
+    .container::before {
+        display: none;
+    }
+
+    .game-board::after {
+        display: none;
+    }
+}
+
+/*....efectos de del fondo....*/
+@keyframes circleFloat {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/*....efectos de del fondo....*/
+@keyframes gridFloat {
+    0% {
+        transform: translate(-25%, -25%) rotate(15deg);
+    }
+    100% {
+        transform: translate(-26%, -26%) rotate(16deg);
+    }
+}
+
+/*....efectos del scoreboard....*/
+.player-score::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg,
+        var(--primary-pastel),
+        var(--secondary-pastel)
+    );
+    border-radius: 20px;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(10px);
+    animation: glowPulse 3s infinite alternate;
+}
+
+/*....efectos de celdas....*/
+.cell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.cell:hover::before {
+    transform: translateX(100%);
+}
+
+/*....efectos de botones....*/
+button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transform: rotate(45deg) translateX(-100%);
+    transition: transform 0.6s;
+}
+
+button:hover::before {
+    transform: rotate(45deg) translateX(100%);
+}
+
